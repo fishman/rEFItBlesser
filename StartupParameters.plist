@@ -1,0 +1,5 @@
+{
+  Description     = "rEFIt Blesser";
+  Provides        = ("rEFIt Blesser");
+  Uses            = ("Disks");
+}
