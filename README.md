@@ -21,3 +21,7 @@ To install simply copy the folder into
 and run
 
     sudo chown -R 0:0 /Library/StartupItems/rEFItBlesser
+
+# Warning
+
+If you have a disk with an Advanced Format Disk, do not use this! It uses bless --info, which is known to cause disk corruption on those drives.
