@@ -46,8 +46,8 @@ StopService ()
 	if MacOSXBlessed ; then
 		mounted=0
 		if [ -f "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" ]; then
-            rEFItLog "Blessing rEFInd on Startup"
-            bless --setBoot --folder "$EFIFOLDER" --file "$EFIFOLDER/$EFIFILE"
+			rEFItLog "Blessing rEFInd on Startup"
+			bless --setBoot --folder "$EFIFOLDER" --file "$EFIFOLDER/$EFIFILE"
 		else
 			rEFItLog "$LABELNAME not found at \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\""
 			mount >> /Users/Shared/rEFItBlesser.log
