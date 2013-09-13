@@ -6,19 +6,9 @@
 # make sure that the volume is mounted when the system shuts down.
 # If the volume is not mounted (because it's removable or hidden), then use MOUNTSLICE
 
-#MOUNTPOINT=""
-
-#MOUNTPOINT="/Volumes/rEFIt"
-#EFIFOLDER="/efi/refit"
-#EFIFILE="refit.efi"
-#LABELFILE="refit.vollabel"
-#LABELNAME="rEFIt"
-#MOUNTSLICE=14
-#MOUNTCOMMAND=mount_hfs
-
-MOUNTPOINT="/Volumes/rEFInd"
-EFIFOLDER="efi/refind"
-EFIFILE="refind.efi"
+MOUNTPOINT=""
+EFIFOLDER="/EFI/refind"
+EFIFILE="refind_x64.efi"
 LABELFILE=""
 LABELNAME="rEFInd"
 MOUNTSLICE=13
@@ -55,62 +45,14 @@ StopService ()
 	rEFItLog "StopService"
 	if MacOSXBlessed ; then
 		mounted=0
-		if ! [ -f "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" ]; then
-			if ! [ -z "$MOUNTSLICE" ]; then
-				rEFItLog "Mounting $LABELNAME"
-				mountoutput=$(mount)
-				DEVICE=$(echo "$mountoutput" | sed -n -E "/\/dev\/(disk[0-9]*)s[0-9]* on \/ .*$/s//\1/p")
-				SLICE="${DEVICE}s${MOUNTSLICE}"
-				NEWMOUNTPOINT="/tmp/${LABELNAME}_${SLICE}"
-				rEFItLog "mkdir $NEWMOUNTPOINT >> /Users/Shared/rEFItBlesser.log 2>&1"
-				mkdir $NEWMOUNTPOINT >> /Users/Shared/rEFItBlesser.log 2>&1 && {
-					rEFItLog "$MOUNTCOMMAND /dev/$SLICE $NEWMOUNTPOINT"
-					$MOUNTCOMMAND /dev/$SLICE $NEWMOUNTPOINT >> /Users/Shared/rEFItBlesser.log 2>&1
-					mounted=1
-					MOUNTPOINT="$NEWMOUNTPOINT"
-					rEFItLog "Mounted $LABELNAME. Mount is $MOUNTPOINT"
-				} || {
-					rEFItLog "$MOUNTPOINT/$EFIFOLDER/$EFIFILE is not found and mkdir failed."
-					ls -l "$MOUNTPOINT" >> /Users/Shared/rEFItBlesser.log 2>&1
-					ls -l "$MOUNTPOINT/$EFIFOLDER" >> /Users/Shared/rEFItBlesser.log 2>&1
-				}
-			fi
-		fi
-		
 		if [ -f "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" ]; then
-			rEFItLog "Blessing $LABELNAME on Shutdown"
-			if [ "$MOUNTCOMMAND" = "mount_hfs" ]; then
-				if ! [ -z "$LABELFILE" ]; then
-					rEFItLog "bless --folder \"$MOUNTPOINT/$EFIFOLDER\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --labelfile \"$MOUNTPOINT/$EFIFOLDER/$LABELFILE\" --setBoot"
-					bless --folder "$MOUNTPOINT/$EFIFOLDER" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --labelfile "$MOUNTPOINT/$EFIFOLDER/$LABELFILE" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				elif ! [ -z "LABELNAME" ]; then
-					rEFItLog "bless --folder \"$MOUNTPOINT/$EFIFOLDER\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --label \"$LABELNAME\" --setBoot"
-					bless --folder "$MOUNTPOINT/$EFIFOLDER" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --label "$LABELNAME" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				else
-					rEFItLog "bless --folder \"$MOUNTPOINT/$EFIFOLDER\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --setBoot"
-					bless --folder "$MOUNTPOINT/$EFIFOLDER" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				fi
-			else
-				if ! [ -z "$LABELFILE" ]; then
-					rEFItLog "bless --mount \"$MOUNTPOINT\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --labelfile \"$MOUNTPOINT/$EFIFOLDER/$LABELFILE\" --setBoot"
-					bless --mount "$MOUNTPOINT" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --labelfile "$MOUNTPOINT/$EFIFOLDER/$LABELFILE" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				elif ! [ -z "LABELNAME" ]; then
-					rEFItLog "bless --mount \"$MOUNTPOINT\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --label \"$LABELNAME\" --setBoot"
-					bless --mount "$MOUNTPOINT" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --label "$LABELNAME" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				else
-					rEFItLog "bless --mount \"$MOUNTPOINT\" --file \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\" --setBoot"
-					bless --mount "$MOUNTPOINT" --file "$MOUNTPOINT/$EFIFOLDER/$EFIFILE" --setBoot >> /Users/Shared/rEFItBlesser.log 2>&1
-				fi
-			fi
+            rEFItLog "Blessing rEFInd on Startup"
+            bless --setBoot --folder "$EFIFOLDER" --file "$EFIFOLDER/$EFIFILE"
 		else
 			rEFItLog "$LABELNAME not found at \"$MOUNTPOINT/$EFIFOLDER/$EFIFILE\""
 			mount >> /Users/Shared/rEFItBlesser.log
 		fi
 
-		if [ $mounted == 1 ] ; then
-			rEFItLog "Unmounting $LABELNAME"
-			umount $MOUNTPOINT
-		fi
 	fi
 	return 0
 }
